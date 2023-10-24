@@ -3,11 +3,7 @@ package controlador;
 import database.Conexion;
 import modelo.Empleados;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Scanner;
+import java.sql.*;
 
 /**
  * @author Jorge Monzón
@@ -17,30 +13,6 @@ public class ControladorEmpleados {
 
     private Connection con = null;
 
-    public Empleados entradaDatosEmpleados() {
-        Scanner scanner = new Scanner(System.in);
-        String dni = "", nombre, apellidoPaterno, apellidoMaterno;
-
-        System.out.println("Ingresar datos");
-        System.out.println("==============");
-        System.out.print("Ingresar Dni: ");
-        dni = scanner.nextLine();
-        System.out.print("Ingresar Nombre: ");
-        nombre = scanner.nextLine();
-        System.out.print("Ingresar Apellido Paterno: ");
-        apellidoPaterno = scanner.nextLine();
-        System.out.print("Ingresar Apellido Materno: ");
-        apellidoMaterno = scanner.nextLine();
-
-        Empleados empleados = new Empleados();
-        empleados.setDni(dni);
-        empleados.setNombre(nombre);
-        empleados.setApellidoPaterno(apellidoPaterno);
-        empleados.setApellidoMaterno(apellidoMaterno);
-
-        return empleados;
-
-    }
 
     public void insertarRegistros(Empleados empleados) {
 
@@ -55,8 +27,14 @@ public class ControladorEmpleados {
             ps.setString(3, empleados.getApellidoPaterno());
             ps.setString(4, empleados.getApellidoMaterno());
 
-            ps.execute();
-            System.out.println("Se Ingreso el registro");
+//            validar si existe dni
+            if (this.buscarDni(empleados.getDni())) {
+                System.out.println("DNI: " + empleados.getDni() + " ya existe");
+            } else {
+                ps.execute();
+                System.out.println("Se Ingreso el registro");
+            }
+
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -67,10 +45,54 @@ public class ControladorEmpleados {
 
     }
 
-    public String buscarDni() {
+    public Boolean buscarDni(String dni) {
+        Boolean encontrado = false;
 
-        return "hola";
+        try {
+            con = Conexion.establecerConexion();
+
+            String sql = "SELECT dni FROM empleados WHERE dni =?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, dni);
+            ResultSet resultSet = ps.executeQuery();
+
+//            mover curso al siguiente dato encontrado
+            if (resultSet.next()) {
+//
+                String dniEncontrado = resultSet.getString("dni");
+//                comparo si dni encontrado con el parametro ingresado
+                encontrado = dniEncontrado.equals(dni);
+                System.out.println("Se encontró el: " + dniEncontrado);
+            } else {
+                System.out.println("DNI no encontrado");
+            }
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+
+        }
+
+        return encontrado;
     }
 
+    public void mostrarRegistros() {
 
+        try {
+            con = Conexion.establecerConexion();
+
+            String sql = "SELECT * FROM empleados";
+            Statement statement = con.createStatement();
+            ResultSet resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                System.out.println(resultSet.getString("id_empleado") + " - " + resultSet.getString("dni") + " - " + resultSet.getString("nombre") + " - " + resultSet.getString("apellido_paterno") + " - " + resultSet.getString("apellido_materno") + " - " + resultSet.getString("fecha_creacion") + " - " + resultSet.getString("fecha_actualizacion"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+    }
 }

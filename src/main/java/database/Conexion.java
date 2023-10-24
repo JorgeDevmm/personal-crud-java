@@ -10,21 +10,21 @@ import java.sql.SQLException;
  */
 public class Conexion {
 
-//    definimos en null la variable conexión
+    //    definimos en null la variable conexión
     private static Connection connection = null;
 
-    public static Connection establecerConexion(){
+    public static Connection establecerConexion() {
 //        validamos si no existe una conexión
-        if(connection == null){
+        if (connection == null) {
             String url = "jdbc:mysql://localhost:3306/empleados";
             String usuario = "root";
             String contrasenia = "abc123*";
 
-            try{
+            try {
 //                establecemos conexión
-                connection = DriverManager.getConnection(url,usuario,contrasenia);
+                connection = DriverManager.getConnection(url, usuario, contrasenia);
                 System.out.println("Se estableció Conexión");
-            }catch (SQLException e){
+            } catch (SQLException e) {
 
                 e.printStackTrace();
             }
@@ -34,18 +34,29 @@ public class Conexion {
     }
 
 
-    public static void cerrarConexion(){
+    public static void cerrarConexion() {
 //        validamos si existe una conexión
-        if(connection != null){
-            try{
+        if (connection != null) {
+            try {
                 connection.close();
                 System.out.println("Se cerro la conexión");
 
-            }catch (SQLException e){
+
+            } catch (SQLException e) {
 
                 e.printStackTrace();
+
+            } finally {
+//            validar cerrar conexión
+                if (connection != null) {
+                    try {
+                        connection.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
-        }else{
+        } else {
             System.out.println("No se encuentra una conexión activa");
         }
     }

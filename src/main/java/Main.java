@@ -10,5 +10,7 @@ public class Main {
         VistaMenu vistaMenu = new VistaMenu();
 
         vistaMenu.getMenu();
+        vistaMenu.cierreOperaciones();
+        System.out.println("---Programa Finalizado---");
     }
 }
