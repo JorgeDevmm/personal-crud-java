@@ -23,7 +23,6 @@ public class Conexion {
             try {
 //                establecemos conexión
                 connection = DriverManager.getConnection(url, usuario, contrasenia);
-                System.out.println("Se estableció Conexión");
             } catch (SQLException e) {
 
                 e.printStackTrace();

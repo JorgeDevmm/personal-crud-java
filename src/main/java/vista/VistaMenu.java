@@ -15,6 +15,7 @@ public class VistaMenu {
 
     Scanner scanner = new Scanner(System.in);
     ControladorEmpleados controladorEmpleados = new ControladorEmpleados();
+    String dni = "", nombre, apellidoPaterno, apellidoMaterno;
 
     public void getMenu() {
         boolean continuar = true;
@@ -29,7 +30,7 @@ public class VistaMenu {
             System.out.println("[2] Buscar empleado");
             System.out.println("[3] Eliminar empleado");
             System.out.println("[4] Mostrar Todos");
-            System.out.println("[5] Filtrar por DNI");
+            System.out.println("[5] Actualizar datos");
             System.out.println("[6] Salir");
 
             System.out.println("=======================");
@@ -40,25 +41,47 @@ public class VistaMenu {
 
             switch (opcion) {
                 case 1:
-                    Empleados empleados = this.entradaDatosEmpleados();
-                    controladorEmpleados.insertarRegistros(empleados);
+                    Empleados empleados = entradaDatosEmpleados();
+                    if (controladorEmpleados.insertarRegistros(empleados)) {
+                        System.out.println("Se Ingreso el registro");
+                    } else {
+                        System.out.println("DNI: " + empleados.getDni() + " ya existe");
+                    }
                     break;
                 case 2:
-                    System.out.print("Ingresar DNI: ");
-                    String dniBuscar = scanner.nextLine();
-                    controladorEmpleados.buscarDni(dniBuscar);
 
+                    String dniABuscar = IngresoDni();
+
+                    if (controladorEmpleados.buscarDni(dniABuscar)) {
+                        System.out.println("Se encontró DNI");
+                        controladorEmpleados.mostrarRegistro(dniABuscar);
+                    } else {
+                        System.out.println("No se encontró el DNI");
+                    }
                     break;
                 case 3:
-                    System.out.println("Eliminar empleado");
+                    String dniAEliminar = IngresoDni();
+                    if (controladorEmpleados.eliminarRegistro(dniAEliminar)) {
+                        System.out.println("Se elimino el registro");
+                    } else {
+                        System.out.println("No se pudo eliminar registro");
+                    }
                     break;
                 case 4:
                     controladorEmpleados.mostrarRegistros();
                     break;
                 case 5:
-                    System.out.println("Filtrar por DNI");
+                    String dniActualizar = IngresoDni();
+                    if(controladorEmpleados.buscarDni(dniActualizar)){
+                        DatosActualizar(new Empleados());
+                    }else{
+                        System.out.println("Dni encontrado");
+                    }
+
+
                     break;
                 case 6:
+                    continuar = false;
                     break;
                 default:
                     System.out.println("Opción no valida");
@@ -66,15 +89,18 @@ public class VistaMenu {
 
             }
 
-//            validar si desea continuar
-            System.out.print("Desea continuar [s/n]: ");
-            mensaje = scanner.nextLine().charAt(0);
+            if (opcion != 6) {
+                //            validar si desea continuar
+                System.out.print("Desea continuar [s/n]: ");
+                mensaje = scanner.nextLine().charAt(0);
 
-            if (mensaje == 's') {
-                continuar = true;
-            } else {
-                continuar = false;
+                if (mensaje == 's') {
+                    continuar = true;
+                } else {
+                    continuar = false;
+                }
             }
+
 
         } while (continuar);
 
@@ -82,8 +108,6 @@ public class VistaMenu {
     }
 
     public Empleados entradaDatosEmpleados() {
-        String dni = "", nombre, apellidoPaterno, apellidoMaterno;
-
         System.out.println("Ingresar datos");
         System.out.println("==============");
         System.out.print("Ingresar Dni: ");
@@ -109,5 +133,49 @@ public class VistaMenu {
         Conexion.cerrarConexion();
     }
 
+    public String IngresoDni() {
+        System.out.print("Ingresar DNI: ");
+        String dniBuscar = scanner.nextLine();
+
+        return dniBuscar;
+    }
+
+    public Empleados DatosActualizar(Empleados empleados) {
+        System.out.println("Ingresar la opción de datos que desea actualizar");
+        int opcionDatos = scanner.nextInt();
+        scanner.nextLine();
+
+        switch (opcionDatos) {
+            case 1:
+                System.out.println("Actualizar DNI");
+                System.out.print("Ingresar Dni: ");
+                dni = scanner.nextLine();
+                empleados.setDni(dni);
+                break;
+            case 2:
+                System.out.println("Actualizar Nombre");
+                System.out.print("Ingresar Nombre: ");
+                nombre = scanner.nextLine();
+                empleados.setNombre(nombre);
+                break;
+            case 3:
+                System.out.println("Actualizar Apellido Paterno");
+                System.out.print("Ingresar Apellido Paterno: ");
+                apellidoPaterno = scanner.nextLine();
+                empleados.setApellidoPaterno(apellidoPaterno);
+                break;
+            case 4:
+                System.out.println("Actualizar Apellido Paterno");
+                System.out.print("Ingresar Apellido Materno: ");
+                apellidoMaterno = scanner.nextLine();
+                empleados.setApellidoMaterno(apellidoMaterno);
+                break;
+            default:
+                break;
+        }
+
+        return empleados;
+
+    }
 
 }
